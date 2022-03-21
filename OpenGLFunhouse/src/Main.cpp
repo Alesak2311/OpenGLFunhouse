@@ -6,85 +6,7 @@
 #include <sstream>
 
 #include "Renderer.h"
-
-struct ShaderSource
-{
-	std::string VertexSource;
-	std::string FragmentSource;
-};
-
-ShaderSource ParseShader(const std::string filepath)
-{
-	enum class ShaderType
-	{
-		NONE = -1,
-		VERTEX = 0,
-		FRAGMENT = 1
-	};
-	ShaderType type = ShaderType::NONE;
-
-	std::ifstream stream(filepath);
-	std::string line;
-	std::stringstream ss[2];
-
-	while (getline(stream, line))
-	{
-		if (line.find("#shader") != std::string::npos)
-		{
-			if (line.find("vertex") != std::string::npos)
-				type = ShaderType::VERTEX;
-			else if (line.find("fragment") != std::string::npos)
-				type = ShaderType::FRAGMENT;
-		}
-		else
-		{
-			ss[(int)type] << line << '\n';
-		}
-	}
-
-	return { ss[0].str(), ss[1].str() };
-}
-
-GLuint CompileShader(GLuint type, const std::string& source)
-{
-	GLCall(GLuint shaderId = glCreateShader(type));
-	const GLchar* src = source.c_str();
-	GLCall(glShaderSource(shaderId, 1, &src, nullptr));
-	GLCall(glCompileShader(shaderId));
-
-	int result;
-	GLCall(glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result));
-	if (result == GL_FALSE)
-	{
-		int length;
-		GLCall(glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &length));
-		char* message = (char*)alloca(length * sizeof(char));
-		GLCall(glGetShaderInfoLog(shaderId, length, &length, message));
-
-		std::cout << message << std::endl;
-	}
-
-	return shaderId;
-}
-
-GLuint CreateShader(std::string filepath)
-{
-	ShaderSource source = ParseShader(filepath);
-
-	GLuint program = glCreateProgram();
-	GLuint vs = CompileShader(GL_VERTEX_SHADER, source.VertexSource);
-	GLuint fs = CompileShader(GL_FRAGMENT_SHADER, source.FragmentSource);
-
-	GLCall(glAttachShader(program, fs));
-	GLCall(glAttachShader(program, vs));
-	GLCall(glLinkProgram(program));
-	GLCall(glValidateProgram(program));
-
-	GLCall(glDeleteShader(vs));
-	GLCall(glDeleteShader(fs));
-
-	return program;
-}
+#include "Shader.h"
 
 int main()
 {
@@ -103,8 +25,8 @@ int main()
 		return -1;
 	}
 
-	GLuint shader = CreateShader("res/shader/Basic.shader");
-	GLCall(glUseProgram(shader));
+	Shader shader("res/shader/Basic.shader");
+	shader.Bind();
 
 	float positions[] = {
 		-0.5f, -0.5f,
