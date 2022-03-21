@@ -2,9 +2,10 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
-#include <iostream>
 #include <fstream>
 #include <sstream>
+
+#include "Renderer.h"
 
 struct ShaderSource
 {
@@ -46,19 +47,19 @@ ShaderSource ParseShader(const std::string filepath)
 
 GLuint CompileShader(GLuint type, const std::string& source)
 {
-	GLuint shaderId = glCreateShader(type);
+	GLCall(GLuint shaderId = glCreateShader(type));
 	const GLchar* src = source.c_str();
-	glShaderSource(shaderId, 1, &src, nullptr);
-	glCompileShader(shaderId);
+	GLCall(glShaderSource(shaderId, 1, &src, nullptr));
+	GLCall(glCompileShader(shaderId));
 
 	int result;
-	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
+	GLCall(glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result));
 	if (result == GL_FALSE)
 	{
 		int length;
-		glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &length);
+		GLCall(glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &length));
 		char* message = (char*)alloca(length * sizeof(char));
-		glGetShaderInfoLog(shaderId, length, &length, message);
+		GLCall(glGetShaderInfoLog(shaderId, length, &length, message));
 
 		std::cout << message << std::endl;
 	}
@@ -74,13 +75,13 @@ GLuint CreateShader(std::string filepath)
 	GLuint vs = CompileShader(GL_VERTEX_SHADER, source.VertexSource);
 	GLuint fs = CompileShader(GL_FRAGMENT_SHADER, source.FragmentSource);
 
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
-	glLinkProgram(program);
-	glValidateProgram(program);
+	GLCall(glAttachShader(program, fs));
+	GLCall(glAttachShader(program, vs));
+	GLCall(glLinkProgram(program));
+	GLCall(glValidateProgram(program));
 
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	GLCall(glDeleteShader(vs));
+	GLCall(glDeleteShader(fs));
 
 	return program;
 }
@@ -103,7 +104,7 @@ int main()
 	}
 
 	GLuint shader = CreateShader("res/shader/Basic.shader");
-	glUseProgram(shader);
+	GLCall(glUseProgram(shader));
 
 	float positions[] = {
 		-0.5f, -0.5f,
@@ -112,24 +113,24 @@ int main()
 	};
 
 	GLuint vb;
-	glGenBuffers(1, &vb);
-	glBindBuffer(GL_ARRAY_BUFFER, vb);
-	glBufferData(GL_ARRAY_BUFFER, 3 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+	GLCall(glGenBuffers(1, &vb));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, vb));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 3 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	GLCall(glEnableVertexAttribArray(0));
+	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
 
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */
-		glClear(GL_COLOR_BUFFER_BIT);
+		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, 3));
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		GLCall(glfwSwapBuffers(window));
+		GLCall(glfwPollEvents());
 	}
 
-	glDeleteBuffers(1, &vb);
+	GLCall(glDeleteBuffers(1, &vb));
 	glfwTerminate();
 }
