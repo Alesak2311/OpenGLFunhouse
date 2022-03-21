@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <iostream>
+
 Shader::Shader(std::string filepath)
 	: m_ID(0), m_Filepath(filepath)
 {
@@ -26,6 +28,11 @@ Shader::~Shader()
 void Shader::Bind() const
 {
 	GLCall(glUseProgram(m_ID));
+}
+
+void Shader::Unbind() const
+{
+	GLCall(glUseProgram(0));
 }
 
 ShaderSources Shader::ParseShader() const

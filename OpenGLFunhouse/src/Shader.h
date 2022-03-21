@@ -22,6 +22,7 @@ public:
 	~Shader();
 
 	void Bind() const;
+	void Unbind() const;
 private:
 	ShaderSources ParseShader() const;
 	GLuint CompileShader(GLuint type, const std::string& source) const;
