@@ -8,6 +8,16 @@
 #include "Renderer.h"
 #include "Shader.h"
 
+std::pair<int, int> getWindowSize()
+{
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+
+	int xpos, ypos, width, height;
+	glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &width, &height);
+
+	return std::make_pair(width / 2, width * 3/8);
+}
+
 int main()
 {
 	if (!glfwInit())
@@ -16,7 +26,9 @@ int main()
 		return -1;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(1600, 1200, "OpenGLFunhouse", NULL, NULL);
+	std::pair<int, int> windowSize = getWindowSize();
+
+	GLFWwindow* window = glfwCreateWindow(windowSize.first, windowSize.second, "OpenGLFunhouse", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
 	if (glewInit() != GLEW_OK)
