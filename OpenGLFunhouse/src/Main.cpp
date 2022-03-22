@@ -1,14 +1,11 @@
-#include <GL/glew.h>
+#include "Renderer.h"
+
 #include <GLFW/glfw3.h>
 
 #include <string>
 #include <fstream>
 #include <sstream>
 
-#include "Renderer.h"
-#include "Shader.h"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
 
 std::pair<int, int> getWindowSize()
 {

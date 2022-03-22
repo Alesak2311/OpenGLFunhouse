@@ -1,10 +1,7 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "Tools.h"
 
-#define ASSERT(x) if(!(x)) __debugbreak()
-#define GLCall(x) ClearError(); x; ASSERT(CheckError())
-
-void ClearError();
-
-bool CheckError();
+#include "VertexArray.h"
+#include "IndexBuffer.h"
+#include "Shader.h"

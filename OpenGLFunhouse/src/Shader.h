@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
+#include "Tools.h"
 
-#include "Renderer.h"
+#include <string>
 
 struct ShaderSources
 {
