@@ -76,12 +76,15 @@ int main()
 
 		IndexBuffer ib(indices, 6);
 
+		// Renderer initialization
+		Renderer renderer;
+
 		// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
-			GLCall(glClear(GL_COLOR_BUFFER_BIT));
+			renderer.Clear();
 
-			GLCall(glDrawElements(GL_TRIANGLES, ib.GetIndexCount(), GL_UNSIGNED_INT, nullptr));
+			renderer.Draw(va, ib, shader);
 
 			glfwPollEvents();
 			glfwSwapBuffers(window);
