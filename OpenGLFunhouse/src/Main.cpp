@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "VertexArray.h"
+#include "IndexBuffer.h"
 
 std::pair<int, int> getWindowSize()
 {
@@ -36,6 +37,8 @@ int main()
 	GLFWwindow* window = glfwCreateWindow(windowSize.first, windowSize.second, "OpenGLFunhouse", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
+	glfwSwapInterval(1);
+
 	if (glewInit() != GLEW_OK)
 	{
 		glfwTerminate();
@@ -60,28 +63,31 @@ int main()
 			-0.5f, -0.5f,
 			 0.5f, -0.5f,
 			-0.5f,  0.5f,
-
-			 0.5f, -0.5f,
-			 0.5f,  0.5f,
-			-0.5f,  0.5f
+			 0.5f,  0.5f
 		};
 
-		VertexBuffer vb(positions, layout, 6);
+		VertexBuffer vb(positions, layout, 4);
 
 		// Bind Vertex Buffer and Layout to Vertex Array
 		va.AddBuffer(vb, layout);
 
-		// TODO: Index Buffer creation
+		// Index Buffer creation
+		unsigned int indices[] = {
+			0, 1, 2,
+			1, 2, 3
+		};
+
+		IndexBuffer ib(indices, 6);
 
 		// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
 			GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, vb.GetVertexCount()));
+			GLCall(glDrawElements(GL_TRIANGLES, ib.GetIndexCount(), GL_UNSIGNED_INT, nullptr));
 
-			GLCall(glfwSwapBuffers(window));
-			GLCall(glfwPollEvents());
+			glfwPollEvents();
+			glfwSwapBuffers(window);
 		}
 	}
 	glfwTerminate();
