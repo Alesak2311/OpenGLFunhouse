@@ -1,9 +1,11 @@
 #include "Shader.h"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 Shader::Shader(std::string filepath)
-	: m_ID(0), m_Filepath(filepath)
+	: m_Filepath(filepath)
 {
 	ShaderSources source = ParseShader();
 
