@@ -51,6 +51,10 @@ int main()
 		// Vertex Array creation
 		VertexArray va;
 
+		// Vertex Layout creation
+		VertexLayout layout;
+		layout.Push(GL_FLOAT, 2);
+
 		// Vertex Buffer creation
 		float positions[] = {
 			-0.5f, -0.5f,
@@ -61,12 +65,10 @@ int main()
 			 0.5f,  0.5f,
 			-0.5f,  0.5f
 		};
-		VertexBuffer vb(positions, 6 * 2 * sizeof(float));
 
-		// Vertex Layout creation
-		VertexLayout layout;
-		layout.Push(GL_FLOAT, 2);
+		VertexBuffer vb(positions, layout, 6);
 
+		// Bind Vertex Buffer and Layout to Vertex Array
 		va.AddBuffer(vb, layout);
 
 		// TODO: Index Buffer creation
@@ -76,7 +78,7 @@ int main()
 		{
 			GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 6));
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, vb.GetVertexCount()));
 
 			GLCall(glfwSwapBuffers(window));
 			GLCall(glfwPollEvents());
