@@ -19,6 +19,7 @@ std::pair<int, int> getWindowSize()
 
 int main()
 {
+	// Setup
 	if (!glfwInit())
 	{
 		glfwTerminate();
@@ -79,10 +80,26 @@ int main()
 		// Renderer initialization
 		Renderer renderer;
 
+		// Main variables
+		float r = 1.0f;
+		float g = 1.0f;
+		float b = 0.0f;
+		float a = 1.0f;
+
+		float increment = 0.01f;
+
 		// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
+
+			g -= increment;
+			b += increment;
+
+			if (g <= 0.0f || g >= 1.0f)
+				increment *= -1;
+
+			shader.Uniform4f(r, g, b, a);
 
 			renderer.Draw(va, ib, shader);
 

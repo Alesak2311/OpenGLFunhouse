@@ -1,5 +1,7 @@
 #include "VertexBuffer.h"
 
+GLuint VertexBuffer::s_BoundID = 0;
+
 VertexBuffer::VertexBuffer(const void* data, const VertexLayout& layout, unsigned int vertexCount)
 	:m_ID(0), m_VertexCount(vertexCount)
 {
@@ -15,12 +17,17 @@ VertexBuffer::~VertexBuffer()
 	GLCall(glDeleteBuffers(1, &m_ID));
 }
 
-void VertexBuffer::Bind() const
+void VertexBuffer::Bind()
 {
+	if (s_BoundID == m_ID)
+		return;
+
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_ID));
+	s_BoundID = m_ID;
 }
 
-void VertexBuffer::Unbind() const
+void VertexBuffer::Unbind()
 {
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	s_BoundID = 0;
 }
