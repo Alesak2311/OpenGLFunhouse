@@ -89,6 +89,12 @@ int main()
 		float increment = 0.01f;
 
 		// Main loop
+		float r = 1.0f;
+		float g = 1.0f;
+		float b = 0.0f;
+		float a = 1.0f;
+
+		float increment = 0.01f;
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
