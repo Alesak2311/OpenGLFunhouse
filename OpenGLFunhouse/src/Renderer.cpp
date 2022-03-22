@@ -7,10 +7,12 @@ void ClearError()
 	while (glGetError() != GL_NO_ERROR);
 }
 
-void CheckError()
+bool CheckError()
 {
-	while (GLenum error = glGetError())
+	if (GLenum error = glGetError())
 	{
 		std::cout << "[OPENGL ERROR] (" << error << ")" << std::endl;
+		return false;
 	}
+	return true;
 }

@@ -1,9 +1,10 @@
 #pragma once
+
 #include <GL/glew.h>
 
-
-#define GLCall(x) ClearError(); x; CheckError()
+#define ASSERT(x) if(!(x)) __debugbreak();
+#define GLCall(x) ClearError(); x; ASSERT(CheckError())
 
 void ClearError();
 
-void CheckError();
+bool CheckError();

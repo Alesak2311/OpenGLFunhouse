@@ -12,7 +12,15 @@ void VertexLayout::Push(GLuint type, unsigned int count, GLuint normalized)
 	switch (type)
 	{
 	case (GL_FLOAT):
-		m_Stride += 4 * count;
+		m_Stride += sizeof(float) * count;
+		break;
+
+	case (GL_UNSIGNED_INT):
+		m_Stride += sizeof(unsigned int) * count;
+		break;
+
+	default:
+		ASSERT(false);
 		break;
 	}
 }
