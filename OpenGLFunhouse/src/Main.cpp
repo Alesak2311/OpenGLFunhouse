@@ -80,9 +80,23 @@ int main()
 		Renderer renderer;
 
 		// Main loop
+		float r = 1.0f;
+		float g = 1.0f;
+		float b = 0.0f;
+		float a = 1.0f;
+
+		float increment = 0.01f;
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
+
+			g -= increment;
+			b += increment;
+
+			if (g <= 0.0f || g >= 1.0f)
+				increment *= -1;
+
+			shader.Uniform4f(r, g, b, a);
 
 			renderer.Draw(va, ib, shader);
 

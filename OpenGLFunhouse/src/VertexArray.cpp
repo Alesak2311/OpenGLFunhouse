@@ -1,5 +1,7 @@
 #include "VertexArray.h"
 
+GLuint VertexArray::s_BoundID = 0;
+
 VertexArray::VertexArray()
 	:m_ID(0)
 {
@@ -12,8 +14,9 @@ VertexArray::~VertexArray()
 	GLCall(glDeleteVertexArrays(1, &m_ID));
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexLayout& layout)
+void VertexArray::AddBuffer(VertexBuffer& vb, const VertexLayout& layout)
 {
+	Bind();
 	vb.Bind();
 
 	const auto& elements = layout.GetElements();
@@ -30,12 +33,18 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexLayout& layout)
 	}
 }
 
-void VertexArray::Bind() const
+void VertexArray::Bind()
 {
+	if (s_BoundID == m_ID)
+		return;
+
 	GLCall(glBindVertexArray(m_ID));
+	s_BoundID = m_ID;
 }
 
-void VertexArray::Unbind() const
+void VertexArray::Unbind()
 {
 	GLCall(glBindVertexArray(0));
+
+	s_BoundID = 0;
 }

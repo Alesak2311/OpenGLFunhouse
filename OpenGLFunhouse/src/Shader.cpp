@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 
+GLuint Shader::s_BoundID = 0;
+
 Shader::Shader(std::string filepath)
 	: m_ID(0), m_Filepath(filepath)
 {
@@ -27,14 +29,28 @@ Shader::~Shader()
 
 }
 
-void Shader::Bind() const
+void Shader::Bind()
 {
+	if (s_BoundID == m_ID)
+		return;
+
 	GLCall(glUseProgram(m_ID));
+	s_BoundID = m_ID;
 }
 
-void Shader::Unbind() const
+void Shader::Unbind()
 {
 	GLCall(glUseProgram(0));
+	s_BoundID = 0;
+}
+
+void Shader::Uniform4f(float v0, float v1, float v2, float v3)
+{
+	Bind();
+
+	GLCall(GLint location = glGetUniformLocation(m_ID, "u_Color"));
+	ASSERT(location != -1);
+	GLCall(glUniform4f(location, v0, v1, v2, v3));
 }
 
 ShaderSources Shader::ParseShader() const

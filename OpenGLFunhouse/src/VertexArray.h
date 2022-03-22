@@ -6,13 +6,15 @@
 class VertexArray
 {
 private:
+	static GLuint s_BoundID;
+
 	GLuint m_ID;
 public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffer(const VertexBuffer& vb, const VertexLayout& layout);
+	void AddBuffer(VertexBuffer& vb, const VertexLayout& layout);
 
-	void Bind() const;
-	void Unbind() const;
+	void Bind();
+	void Unbind();
 };
