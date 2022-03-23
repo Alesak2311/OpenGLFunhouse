@@ -2,6 +2,10 @@
 
 #include <GLFW/glfw3.h>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -36,6 +40,18 @@ int main()
 	glfwMakeContextCurrent(window);
 
 	glfwSwapInterval(1);
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
 
 	if (glewInit() != GLEW_OK)
 	{
@@ -91,6 +107,11 @@ int main()
 		// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
+			// Start the Dear ImGui frame
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
 			renderer.Clear();
 
 			g -= increment;
@@ -103,9 +124,23 @@ int main()
 
 			renderer.Draw(va, ib, shader);
 
+			{
+				ImGui::Text("Hello");
+			}
+
 			glfwPollEvents();
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 			glfwSwapBuffers(window);
 		}
 	}
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	glfwDestroyWindow(window);
 	glfwTerminate();
 }
