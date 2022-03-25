@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Texture.h"
 
 #include <GLFW/glfw3.h>
 
@@ -65,19 +66,29 @@ int main()
 		Shader shader("res/shader/Basic.shader");
 		shader.Bind();
 
+		GLCall(glEnable(GL_BLEND));
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+		// Texture creation
+		glEnable(GL_TEXTURE_2D);
+		Texture texture("res/textures/krtkus.png");
+		texture.Bind();
+		shader.Uniform1i("u_Texture", 0);
+
 		// Vertex Array creation
 		VertexArray va;
 
 		// Vertex Layout creation
 		VertexLayout layout;
 		layout.Push(GL_FLOAT, 2);
+		layout.Push(GL_FLOAT, 2);
 
 		// Vertex Buffer creation
 		float positions[] = {
-			-0.5f, -0.5f,
-			 0.5f, -0.5f,
-			-0.5f,  0.5f,
-			 0.5f,  0.5f
+			-0.5f, -0.5f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 1.0f, 0.0f,
+			-0.5f,  0.5f, 0.0f, 1.0f,
+			 0.5f,  0.5f, 1.0f, 1.0f
 		};
 
 		VertexBuffer vb(positions, layout, 4);
@@ -104,6 +115,9 @@ int main()
 
 		float increment = 0.01f;
 
+		shader.Unbind();
+		ib.Unbind();
+
 		// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
@@ -120,7 +134,7 @@ int main()
 			if (g <= 0.0f || g >= 1.0f)
 				increment *= -1;
 
-			shader.Uniform4f(r, g, b, a);
+			// shader.Uniform4f("u_Color", r, g, b, a);
 
 			renderer.Draw(va, ib, shader);
 

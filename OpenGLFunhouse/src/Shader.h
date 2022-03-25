@@ -24,7 +24,8 @@ public:
 	void Bind();
 	void Unbind();
 
-	void Uniform4f(float v0, float v1, float v2, float v3);
+	void Uniform1i(std::string name, int v0);
+	void Uniform4f(std::string name, float v0, float v1, float v2, float v3);
 
 	inline GLuint GetID() const { return m_ID; };
 private:

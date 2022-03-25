@@ -44,11 +44,20 @@ void Shader::Unbind()
 	s_BoundID = 0;
 }
 
-void Shader::Uniform4f(float v0, float v1, float v2, float v3)
+void Shader::Uniform1i(std::string name, int v0)
 {
 	Bind();
 
-	GLCall(GLint location = glGetUniformLocation(m_ID, "u_Color"));
+	GLCall(GLint location = glGetUniformLocation(m_ID, name.c_str()));
+	ASSERT(location != -1);
+	GLCall(glUniform1i(location, v0));
+}
+
+void Shader::Uniform4f(std::string name, float v0, float v1, float v2, float v3)
+{
+	Bind();
+
+	GLCall(GLint location = glGetUniformLocation(m_ID, name.c_str()));
 	ASSERT(location != -1);
 	GLCall(glUniform4f(location, v0, v1, v2, v3));
 }

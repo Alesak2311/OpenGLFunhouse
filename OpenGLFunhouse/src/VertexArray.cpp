@@ -31,6 +31,7 @@ void VertexArray::AddBuffer(VertexBuffer& vb, const VertexLayout& layout)
 
 		offset += element.count;
 	}
+	vb.Unbind();
 }
 
 void VertexArray::Bind()
