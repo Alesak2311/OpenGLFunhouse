@@ -9,14 +9,20 @@ void VertexLayout::Push(GLuint type, unsigned int count, GLuint normalized)
 {
 	m_Elements.push_back({ type, count, normalized });
 
+	m_Stride += m_Elements.back().size;
+}
+
+VertexLayoutElement::VertexLayoutElement(GLuint type, unsigned int count, GLuint normalized)
+	:type(type), count(count), normalized(normalized), size(0)
+{
 	switch (type)
 	{
 	case (GL_FLOAT):
-		m_Stride += sizeof(float) * count;
+		size = sizeof(float) * count;
 		break;
 
 	case (GL_UNSIGNED_INT):
-		m_Stride += sizeof(unsigned int) * count;
+		size = sizeof(unsigned int) * count;
 		break;
 
 	default:

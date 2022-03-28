@@ -9,6 +9,10 @@ struct VertexLayoutElement
 	GLuint type;
 	unsigned int count;
 	GLuint normalized;
+
+	unsigned int size;
+
+	VertexLayoutElement(GLuint type, unsigned int count, GLuint normalized);
 };
 
 class VertexLayout

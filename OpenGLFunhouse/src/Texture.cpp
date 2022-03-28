@@ -1,6 +1,7 @@
 #include "Texture.h"
 
 #include <stb_image/stb_image.h>
+#include <iostream>
 
 GLuint Texture::s_BoundID = 0;
 
@@ -11,7 +12,7 @@ Texture::Texture(const std::string& filepath)
 	m_Buffer = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_BPP, 4);
 
 	GLCall(glGenTextures(1, &m_ID));
-	GLCall(glBindTexture(GL_TEXTURE_2D, m_ID));
+	Bind();
 
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
@@ -20,7 +21,8 @@ Texture::Texture(const std::string& filepath)
 
 	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer));
 
-	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+	Unbind();
+
 	if (m_Buffer)
 		stbi_image_free(m_Buffer);
 }

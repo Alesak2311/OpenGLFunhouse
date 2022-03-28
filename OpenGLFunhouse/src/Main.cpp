@@ -66,14 +66,12 @@ int main()
 		Shader shader("res/shader/Basic.shader");
 		shader.Bind();
 
-		GLCall(glEnable(GL_BLEND));
-		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
 		// Texture creation
-		glEnable(GL_TEXTURE_2D);
 		Texture texture("res/textures/krtkus.png");
 		texture.Bind();
-		shader.Uniform1i("u_Texture", 0);
+
+		GLCall(glEnable(GL_BLEND));
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 		// Vertex Array creation
 		VertexArray va;
@@ -84,11 +82,12 @@ int main()
 		layout.Push(GL_FLOAT, 2);
 
 		// Vertex Buffer creation
+		/*   positions		 texture coords */
 		float positions[] = {
-			-0.5f, -0.5f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 1.0f, 0.0f,
-			-0.5f,  0.5f, 0.0f, 1.0f,
-			 0.5f,  0.5f, 1.0f, 1.0f
+			-0.5f, -0.5f,	 0.0f, 0.0f,
+			 0.5f, -0.5f,	 1.0f, 0.0f,
+			-0.5f,  0.5f,	 0.0f, 1.0f,
+			 0.5f,  0.5f,	 1.0f, 1.0f
 		};
 
 		VertexBuffer vb(positions, layout, 4);
@@ -108,15 +107,6 @@ int main()
 		Renderer renderer;
 
 		// Main variables
-		float r = 1.0f;
-		float g = 1.0f;
-		float b = 0.0f;
-		float a = 1.0f;
-
-		float increment = 0.01f;
-
-		shader.Unbind();
-		ib.Unbind();
 
 		// Main loop
 		while (!glfwWindowShouldClose(window))
@@ -128,15 +118,7 @@ int main()
 
 			renderer.Clear();
 
-			g -= increment;
-			b += increment;
-
-			if (g <= 0.0f || g >= 1.0f)
-				increment *= -1;
-
-			// shader.Uniform4f("u_Color", r, g, b, a);
-
-			renderer.Draw(va, ib, shader);
+			renderer.Draw(va, ib, shader, texture);
 
 			{
 				ImGui::Text("Hello");

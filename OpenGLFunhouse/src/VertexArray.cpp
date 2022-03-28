@@ -24,12 +24,12 @@ void VertexArray::AddBuffer(VertexBuffer& vb, const VertexLayout& layout)
 
 	for (unsigned int i = 0; i < elements.size(); ++i)
 	{
-		const auto& element = elements[i];
+		const VertexLayoutElement& element = elements[i];
 
 		GLCall(glEnableVertexAttribArray(i));
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
 
-		offset += element.count;
+		offset += element.size;
 	}
 	vb.Unbind();
 }
