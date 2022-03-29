@@ -64,6 +64,7 @@ int main()
 		// Shader creation
 		Shader shader("res/shader/Basic.shader");
 		shader.Bind();
+		glEnable(GL_DEPTH_TEST);
 
 		// Texture creation
 		Texture texture("res/textures/krtkus.png");
@@ -77,19 +78,24 @@ int main()
 
 		// Vertex Layout creation
 		VertexLayout layout;
-		layout.Push(GL_FLOAT, 2);
+		layout.Push(GL_FLOAT, 3);
 		layout.Push(GL_FLOAT, 2);
 
 		// Vertex Buffer creation
-		/*   positions		 texture coords */
+		/*   positions				texture coords */
 		float positions[] = {
-			 50.0f,  50.0f,	 0.0f, 0.0f,
-			150.0f,  50.0f,	 1.0f, 0.0f,
-			 50.0f, 150.0f,	 0.0f, 1.0f,
-			150.0f, 150.0f,	 1.0f, 1.0f
+			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
+			-0.5f,  0.5f, 0.0f,		0.0f, 1.0f,
+			 0.5f,  0.5f, 0.0f,		1.0f, 1.0f,
+
+			 0.5f, -0.5f, 1.0f,		1.0f, 0.0f,
+			-0.5f,  0.5f, 1.0f,		0.0f, 1.0f,
+			-0.5f, -0.5f, 1.0f,		0.0f, 0.0f,
+			 0.5f,  0.5f, 1.0f,		1.0f, 1.0f
 		};
 
-		VertexBuffer vb(positions, layout, 4);
+		VertexBuffer vb(positions, layout, 8);
 
 		// Bind Vertex Buffer and Layout to Vertex Array
 		va.AddBuffer(vb, layout);
@@ -103,18 +109,20 @@ int main()
 		IndexBuffer ib(indices, 6);
 
 		// MVP Matrices
-		glm::mat4 proj = glm::ortho(0.0f, 400.0f, 0.0f, 300.0f);
+		glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)(windowSize.first / windowSize.second), 0.1f, 100.0f);
 
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-
-		glm::mat4 mvp = proj * view * model;
+		
 
 		// Renderer initialization
 		Renderer renderer;
 
 		// Main variables
+
+		float camera[] = { 0.0f, 0.0f, -1.0f };
+
+		float krtkus1[] = { 0.0f, 0.0f, 0.0f };
+
+		float rotation[] = { 0.0f, 0.0f, 0.0f };
 
 		// Main loop
 		while (!glfwWindowShouldClose(window))
@@ -127,12 +135,27 @@ int main()
 			renderer.Clear();
 
 			shader.Uniform1i("u_Texture", 0);
-			shader.UniformMat4f("u_MVP", mvp);
+
+			{
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, glm::vec3(krtkus1[0], krtkus1[1], krtkus1[2]));
+				model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+
+				glm::mat4 view = glm::mat4(1.0f);
+				view = glm::translate(view, glm::vec3(camera[0], camera[1], camera[2]));
+
+				glm::mat4 mvp = proj * view * model;
+				shader.UniformMat4f("u_MVP", mvp);
+			}
 
 			renderer.Draw(va, ib, shader, texture);
 
 			{
-				ImGui::Text("Hello");
+				ImGui::SliderFloat3("camera", camera, -3.0f, 3.0f);
+				ImGui::SliderFloat3("krtkus 1", krtkus1, -1.0f, 1.0f);
+				ImGui::SliderFloat3("rotation", rotation, -180, 180);
 			}
 
 			glfwPollEvents();
