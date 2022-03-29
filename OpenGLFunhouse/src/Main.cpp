@@ -86,13 +86,13 @@ int main()
 		float positions[] = {
 			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
 			 0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
-			-0.5f,  0.5f, 0.0f,		0.0f, 1.0f,
 			 0.5f,  0.5f, 0.0f,		1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f,		0.0f, 1.0f,
 
-			 0.5f, -0.5f, 1.0f,		1.0f, 0.0f,
-			-0.5f,  0.5f, 1.0f,		0.0f, 1.0f,
-			-0.5f, -0.5f, 1.0f,		0.0f, 0.0f,
-			 0.5f,  0.5f, 1.0f,		1.0f, 1.0f
+			-0.5f, -0.5f, 1.0f,		1.0f, 1.0f,
+			 0.5f, -0.5f, 1.0f,		0.0f, 1.0f,
+			 0.5f,  0.5f, 1.0f,		0.0f, 0.0f,
+			-0.5f,  0.5f, 1.0f,		1.0f, 0.0f
 		};
 
 		VertexBuffer vb(positions, layout, 8);
@@ -103,10 +103,25 @@ int main()
 		// Index Buffer creation
 		unsigned int indices[] = {
 			0, 1, 2,
-			1, 2, 3
+			2, 3, 0,
+
+			1, 5, 6,
+			6, 2, 1,
+
+			4, 5, 6,
+			6, 7, 4,
+
+			4, 0, 3,
+			3, 7, 4,
+
+			4, 5, 1,
+			1, 0, 4,
+
+			3, 2, 6,
+			6, 7, 3
 		};
 
-		IndexBuffer ib(indices, 6);
+		IndexBuffer ib(indices, 36);
 
 		// MVP Matrices
 		glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)(windowSize.first / windowSize.second), 0.1f, 100.0f);
@@ -118,11 +133,13 @@ int main()
 
 		// Main variables
 
-		float camera[] = { 0.0f, 0.0f, -1.0f };
+		float camera[] = { 0.0f, 0.0f, -3.0f };
 
 		float krtkus1[] = { 0.0f, 0.0f, 0.0f };
+		float krtkus2[] = { 0.0f, 0.0f, 0.0f };
 
-		float rotation[] = { 0.0f, 0.0f, 0.0f };
+		float rotation1[] = { 0.0f, 0.0f, 0.0f };
+		float rotation2[] = { 0.0f, 0.0f, 0.0f };
 
 		// Main loop
 		while (!glfwWindowShouldClose(window))
@@ -139,9 +156,9 @@ int main()
 			{
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, glm::vec3(krtkus1[0], krtkus1[1], krtkus1[2]));
-				model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::rotate(model, glm::radians(rotation1[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(rotation1[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(rotation1[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
 				glm::mat4 view = glm::mat4(1.0f);
 				view = glm::translate(view, glm::vec3(camera[0], camera[1], camera[2]));
@@ -153,9 +170,27 @@ int main()
 			renderer.Draw(va, ib, shader, texture);
 
 			{
-				ImGui::SliderFloat3("camera", camera, -3.0f, 3.0f);
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, glm::vec3(krtkus2[0], krtkus2[1], krtkus2[2]));
+				model = glm::rotate(model, glm::radians(rotation2[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(rotation2[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(rotation2[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+
+				glm::mat4 view = glm::mat4(1.0f);
+				view = glm::translate(view, glm::vec3(camera[0], camera[1], camera[2]));
+
+				glm::mat4 mvp = proj * view * model;
+				shader.UniformMat4f("u_MVP", mvp);
+			}
+
+			renderer.Draw(va, ib, shader, texture);
+
+			{
+				ImGui::SliderFloat3("camera", camera, -10.0f, 10.0f);
 				ImGui::SliderFloat3("krtkus 1", krtkus1, -1.0f, 1.0f);
-				ImGui::SliderFloat3("rotation", rotation, -180, 180);
+				ImGui::SliderFloat3("rotation 1", rotation1, -180, 180);
+				ImGui::SliderFloat3("krtkus 2", krtkus2, -1.0f, 1.0f);
+				ImGui::SliderFloat3("rotation 2", rotation2, -180, 180);
 			}
 
 			glfwPollEvents();
