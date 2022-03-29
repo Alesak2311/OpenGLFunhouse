@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include "Texture.h"
 
 #include <GLFW/glfw3.h>
 
@@ -84,10 +83,10 @@ int main()
 		// Vertex Buffer creation
 		/*   positions		 texture coords */
 		float positions[] = {
-			-0.5f, -0.5f,	 0.0f, 0.0f,
-			 0.5f, -0.5f,	 1.0f, 0.0f,
-			-0.5f,  0.5f,	 0.0f, 1.0f,
-			 0.5f,  0.5f,	 1.0f, 1.0f
+			 50.0f,  50.0f,	 0.0f, 0.0f,
+			150.0f,  50.0f,	 1.0f, 0.0f,
+			 50.0f, 150.0f,	 0.0f, 1.0f,
+			150.0f, 150.0f,	 1.0f, 1.0f
 		};
 
 		VertexBuffer vb(positions, layout, 4);
@@ -103,6 +102,15 @@ int main()
 
 		IndexBuffer ib(indices, 6);
 
+		// MVP Matrices
+		glm::mat4 proj = glm::ortho(0.0f, 400.0f, 0.0f, 300.0f);
+
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+
+		glm::mat4 mvp = proj * view * model;
+
 		// Renderer initialization
 		Renderer renderer;
 
@@ -117,6 +125,9 @@ int main()
 			ImGui::NewFrame();
 
 			renderer.Clear();
+
+			shader.Uniform1i("u_Texture", 0);
+			shader.UniformMat4f("u_MVP", mvp);
 
 			renderer.Draw(va, ib, shader, texture);
 

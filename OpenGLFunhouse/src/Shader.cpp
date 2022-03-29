@@ -44,7 +44,7 @@ void Shader::Unbind()
 	s_BoundID = 0;
 }
 
-void Shader::Uniform1i(std::string name, int v0)
+void Shader::Uniform1i(const std::string& name, int v0)
 {
 	Bind();
 
@@ -53,13 +53,22 @@ void Shader::Uniform1i(std::string name, int v0)
 	GLCall(glUniform1i(location, v0));
 }
 
-void Shader::Uniform4f(std::string name, float v0, float v1, float v2, float v3)
+void Shader::Uniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	Bind();
 
 	GLCall(GLint location = glGetUniformLocation(m_ID, name.c_str()));
 	ASSERT(location != -1);
 	GLCall(glUniform4f(location, v0, v1, v2, v3));
+}
+
+void Shader::UniformMat4f(const std::string& name, const glm::mat4& mat)
+{
+	Bind();
+
+	GLCall(GLint location = glGetUniformLocation(m_ID, name.c_str()));
+	ASSERT(location != -1);
+	glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
 ShaderSources Shader::ParseShader() const
