@@ -84,41 +84,48 @@ int main()
 		// Vertex Buffer creation
 		/*   positions				texture coords */
 		float positions[] = {
-			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f,		1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f,		0.0f, 1.0f,
-
-			-0.5f, -0.5f, 1.0f,		1.0f, 1.0f,
-			 0.5f, -0.5f, 1.0f,		0.0f, 1.0f,
-			 0.5f,  0.5f, 1.0f,		0.0f, 0.0f,
-			-0.5f,  0.5f, 1.0f,		1.0f, 0.0f
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,   // 0
+			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,   // 1
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,   // 2
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,   // 3
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,   // 4
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,   // 5
+			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,   // 6
+			-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,   // 7
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,   // 8
+			-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,   // 9
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,   // 10
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,   // 11
+			 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,   // 12
+			 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,   // 13
+			 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,   // 14
+			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,   // 15
 		};
 
-		VertexBuffer vb(positions, layout, 8);
+		VertexBuffer vb(positions, layout, 16);
 
 		// Bind Vertex Buffer and Layout to Vertex Array
 		va.AddBuffer(vb, layout);
 
 		// Index Buffer creation
 		unsigned int indices[] = {
-			0, 1, 2,
-			2, 3, 0,
+			0 , 1 , 2 ,
+			2 , 3 , 0 ,
 
-			1, 5, 6,
-			6, 2, 1,
+			4 , 5 , 6 ,
+			6 , 7 , 4 ,
 
-			4, 5, 6,
-			6, 7, 4,
+			8 , 9 , 10,
+			10, 4 , 8 ,
 
-			4, 0, 3,
-			3, 7, 4,
+			11, 2 , 12,
+			12, 13, 11,
 
-			4, 5, 1,
-			1, 0, 4,
+			10, 14, 5 ,
+			5 , 4 , 10,
 
-			3, 2, 6,
-			6, 7, 3
+			3 , 2 , 11,
+			11, 15, 3
 		};
 
 		IndexBuffer ib(indices, 36);
@@ -169,7 +176,7 @@ int main()
 
 			renderer.Draw(va, ib, shader, texture);
 
-			{
+			/*{
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, glm::vec3(krtkus2[0], krtkus2[1], krtkus2[2]));
 				model = glm::rotate(model, glm::radians(rotation2[0]), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -183,7 +190,7 @@ int main()
 				shader.UniformMat4f("u_MVP", mvp);
 			}
 
-			renderer.Draw(va, ib, shader, texture);
+			renderer.Draw(va, ib, shader, texture);*/
 
 			{
 				ImGui::SliderFloat3("camera", camera, -10.0f, 10.0f);
