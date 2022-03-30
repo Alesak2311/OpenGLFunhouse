@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include "Camera.h"
+
 #include <GLFW/glfw3.h>
 
 #include <imgui/imgui.h>
@@ -10,7 +12,6 @@
 #include <fstream>
 #include <sstream>
 
-
 std::pair<int, int> getWindowSize()
 {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -19,6 +20,22 @@ std::pair<int, int> getWindowSize()
 	glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &width, &height);
 
 	return std::make_pair(width / 2, width * 3/8);
+}
+
+void processInput(GLFWwindow* window, Camera& camera)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	const float cameraSpeed = 0.05f; // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.MoveForward();
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.MoveBackward();
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.MoveRight();
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.MoveLeft();
 }
 
 int main()
@@ -84,22 +101,22 @@ int main()
 		// Vertex Buffer creation
 		/*   positions				texture coords */
 		float positions[] = {
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,   // 0
-			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,   // 1
-			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,   // 2
-			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,   // 3
-			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,   // 4
-			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,   // 5
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,   // 6
-			-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,   // 7
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,   // 8
-			-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,   // 9
-			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,   // 10
-			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,   // 11
-			 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,   // 12
-			 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,   // 13
-			 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,   // 14
-			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,   // 15
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,   // 0
+			 0.5f, -0.5f, -0.5f,	1.0f, 0.0f,   // 1
+			 0.5f,  0.5f, -0.5f,	1.0f, 1.0f,   // 2
+			-0.5f,  0.5f, -0.5f,	0.0f, 1.0f,   // 3
+			-0.5f, -0.5f,  0.5f,	0.0f, 0.0f,   // 4
+			 0.5f, -0.5f,  0.5f,	1.0f, 0.0f,   // 5
+			 0.5f,  0.5f,  0.5f,	1.0f, 1.0f,   // 6
+			-0.5f,  0.5f,  0.5f,	0.0f, 1.0f,   // 7
+			-0.5f,  0.5f,  0.5f,	1.0f, 0.0f,   // 8
+			-0.5f,  0.5f, -0.5f,	1.0f, 1.0f,   // 9
+			-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,   // 10
+			 0.5f,  0.5f,  0.5f,	1.0f, 0.0f,   // 11
+			 0.5f, -0.5f, -0.5f,	0.0f, 1.0f,   // 12
+			 0.5f, -0.5f,  0.5f,	0.0f, 0.0f,   // 13
+			 0.5f, -0.5f, -0.5f,	1.0f, 1.0f,   // 14
+			-0.5f,  0.5f,  0.5f,	0.0f, 0.0f,   // 15
 		};
 
 		VertexBuffer vb(positions, layout, 16);
@@ -140,13 +157,11 @@ int main()
 
 		// Main variables
 
-		float camera[] = { 0.0f, 0.0f, -3.0f };
+		Camera camera;
 
 		float krtkus1[] = { 0.0f, 0.0f, 0.0f };
-		float krtkus2[] = { 0.0f, 0.0f, 0.0f };
 
 		float rotation1[] = { 0.0f, 0.0f, 0.0f };
-		float rotation2[] = { 0.0f, 0.0f, 0.0f };
 
 		// Main loop
 		while (!glfwWindowShouldClose(window))
@@ -167,8 +182,7 @@ int main()
 				model = glm::rotate(model, glm::radians(rotation1[1]), glm::vec3(0.0f, 1.0f, 0.0f));
 				model = glm::rotate(model, glm::radians(rotation1[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-				glm::mat4 view = glm::mat4(1.0f);
-				view = glm::translate(view, glm::vec3(camera[0], camera[1], camera[2]));
+				glm::mat4 view = camera.GenViewMat();
 
 				glm::mat4 mvp = proj * view * model;
 				shader.UniformMat4f("u_MVP", mvp);
@@ -176,31 +190,13 @@ int main()
 
 			renderer.Draw(va, ib, shader, texture);
 
-			/*{
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(krtkus2[0], krtkus2[1], krtkus2[2]));
-				model = glm::rotate(model, glm::radians(rotation2[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotation2[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotation2[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-
-				glm::mat4 view = glm::mat4(1.0f);
-				view = glm::translate(view, glm::vec3(camera[0], camera[1], camera[2]));
-
-				glm::mat4 mvp = proj * view * model;
-				shader.UniformMat4f("u_MVP", mvp);
-			}
-
-			renderer.Draw(va, ib, shader, texture);*/
-
 			{
-				ImGui::SliderFloat3("camera", camera, -10.0f, 10.0f);
 				ImGui::SliderFloat3("krtkus 1", krtkus1, -1.0f, 1.0f);
 				ImGui::SliderFloat3("rotation 1", rotation1, -180, 180);
-				ImGui::SliderFloat3("krtkus 2", krtkus2, -1.0f, 1.0f);
-				ImGui::SliderFloat3("rotation 2", rotation2, -180, 180);
 			}
 
 			glfwPollEvents();
+			processInput(window, camera);
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
