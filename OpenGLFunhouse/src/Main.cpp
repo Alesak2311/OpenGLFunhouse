@@ -12,6 +12,8 @@
 #include <fstream>
 #include <sstream>
 
+Camera camera;
+
 std::pair<int, int> getWindowSize()
 {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -22,12 +24,16 @@ std::pair<int, int> getWindowSize()
 	return std::make_pair(width / 2, width * 3/8);
 }
 
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	camera.MouseCallback(xpos, ypos);
+}
+
 void processInput(GLFWwindow* window, Camera& camera)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	const float cameraSpeed = 0.05f; // adjust accordingly
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.MoveForward();
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -36,6 +42,15 @@ void processInput(GLFWwindow* window, Camera& camera)
 		camera.MoveRight();
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		camera.MoveLeft();
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		camera.Tilt(-1.0f);
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		camera.Tilt(1.0f);
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		camera.Turn(1.0f);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		camera.Turn(-1.0f);
 }
 
 int main()
@@ -57,6 +72,9 @@ int main()
 	glfwMakeContextCurrent(window);
 
 	glfwSwapInterval(1);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouseCallback);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -157,7 +175,6 @@ int main()
 
 		// Main variables
 
-		Camera camera;
 
 		float krtkus1[] = { 0.0f, 0.0f, 0.0f };
 
@@ -190,10 +207,16 @@ int main()
 
 			renderer.Draw(va, ib, shader, texture);
 
-			{
+			/*{
 				ImGui::SliderFloat3("krtkus 1", krtkus1, -1.0f, 1.0f);
 				ImGui::SliderFloat3("rotation 1", rotation1, -180, 180);
-			}
+
+				if (ImGui::Button("<-"))
+					camera.Turn(-1.0f);
+				ImGui::SameLine();
+				if (ImGui::Button("->"))
+					camera.Turn(1.0f);
+			}*/
 
 			glfwPollEvents();
 			processInput(window, camera);
