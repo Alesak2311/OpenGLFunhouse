@@ -1,7 +1,6 @@
 #include "Camera.h"
 
 const float Camera::s_Speed = 0.05f;
-bool Camera::s_FirstMouse = true;
 float Camera::s_Sensitivity = 0.1f;
 
 Camera::Camera()
@@ -24,47 +23,6 @@ void Camera::CalculateDirection()
 	m_Front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 }
 
-void Camera::MouseCallback(double xpos, double ypos)
-{
-	if (s_FirstMouse)
-	{
-		m_LastX = xpos;
-		m_LastY = ypos;
-		s_FirstMouse = false;
-	}
-
-	float xoffset = xpos - m_LastX;
-	float yoffset = m_LastY - ypos;
-	m_LastX = xpos;
-	m_LastY = ypos;
-
-	xoffset *= s_Sensitivity;
-	yoffset *= s_Sensitivity;
-
-	Turn(xoffset);
-	Tilt(yoffset);
-}
-
-void Camera::MoveForward()
-{
-	m_Pos += s_Speed * m_Front;
-}
-
-void Camera::MoveBackward()
-{
-	m_Pos -= s_Speed * m_Front;
-}
-
-void Camera::MoveRight()
-{
-	m_Pos += glm::normalize(glm::cross(m_Front, m_Up)) * s_Speed;
-}
-
-void Camera::MoveLeft()
-{
-	m_Pos -= glm::normalize(glm::cross(m_Front, m_Up)) * s_Speed;
-}
-
 void Camera::Turn(float angle)
 {
 	m_yaw += angle;
@@ -82,4 +40,13 @@ void Camera::Tilt(float angle)
 		m_pitch = -89.0f;
 
 	CalculateDirection();
+}
+
+void Camera::HandleMouse(double xOffset, double yOffset)
+{
+	xOffset *= s_Sensitivity;
+	yOffset *= s_Sensitivity;
+
+	Turn((float)(xOffset));
+	Tilt((float)(yOffset));
 }

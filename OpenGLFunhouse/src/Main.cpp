@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 
-#include <GLFW/glfw3.h>
+#include "Window.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -12,69 +12,13 @@
 #include <fstream>
 #include <sstream>
 
-Camera camera;
-
-std::pair<int, int> getWindowSize()
-{
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-
-	int xpos, ypos, width, height;
-	glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &width, &height);
-
-	return std::make_pair(width / 2, width * 3/8);
-}
-
-void mouseCallback(GLFWwindow* window, double xpos, double ypos)
-{
-	camera.MouseCallback(xpos, ypos);
-}
-
-void processInput(GLFWwindow* window, Camera& camera)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.MoveForward();
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.MoveBackward();
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.MoveRight();
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.MoveLeft();
-
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		camera.Tilt(-1.0f);
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		camera.Tilt(1.0f);
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		camera.Turn(1.0f);
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		camera.Turn(-1.0f);
-}
-
 int main()
 {
 	// Setup
-	if (!glfwInit())
-	{
-		glfwTerminate();
-		return -1;
-	}
+	Window window;
+	Camera camera;
 
-	std::pair<int, int> windowSize = getWindowSize();
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(windowSize.first, windowSize.second, "OpenGLFunhouse", NULL, NULL);
-	glfwMakeContextCurrent(window);
-
-	glfwSwapInterval(1);
-
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouseCallback);
+	window.BindCamera(&camera);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -85,9 +29,10 @@ int main()
 	ImGui::StyleColorsDark();
 
 	// Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(window.GetGLFWWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
+	// Initialize GLEW
 	if (glewInit() != GLEW_OK)
 	{
 		glfwTerminate();
@@ -165,23 +110,16 @@ int main()
 
 		IndexBuffer ib(indices, 36);
 
-		// MVP Matrices
-		glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)(windowSize.first / windowSize.second), 0.1f, 100.0f);
-
-		
+		// Projection Matrix
+		glm::mat4 proj = glm::perspective(glm::radians(45.0f), window.GetAspectRatio(), 0.1f, 100.0f);		
 
 		// Renderer initialization
 		Renderer renderer;
 
 		// Main variables
 
-
-		float krtkus1[] = { 0.0f, 0.0f, 0.0f };
-
-		float rotation1[] = { 0.0f, 0.0f, 0.0f };
-
 		// Main loop
-		while (!glfwWindowShouldClose(window))
+		while (!glfwWindowShouldClose(window.GetGLFWWindow()))
 		{
 			// Start the Dear ImGui frame
 			ImGui_ImplOpenGL3_NewFrame();
@@ -194,10 +132,6 @@ int main()
 
 			{
 				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(krtkus1[0], krtkus1[1], krtkus1[2]));
-				model = glm::rotate(model, glm::radians(rotation1[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotation1[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotation1[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
 				glm::mat4 view = camera.GenViewMat();
 
@@ -207,24 +141,12 @@ int main()
 
 			renderer.Draw(va, ib, shader, texture);
 
-			/*{
-				ImGui::SliderFloat3("krtkus 1", krtkus1, -1.0f, 1.0f);
-				ImGui::SliderFloat3("rotation 1", rotation1, -180, 180);
-
-				if (ImGui::Button("<-"))
-					camera.Turn(-1.0f);
-				ImGui::SameLine();
-				if (ImGui::Button("->"))
-					camera.Turn(1.0f);
-			}*/
-
-			glfwPollEvents();
-			processInput(window, camera);
+			window.PollEvents();
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(window.GetGLFWWindow());
 		}
 	}
 	// Cleanup
@@ -232,6 +154,5 @@ int main()
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	glfwDestroyWindow(window);
 	glfwTerminate();
 }
