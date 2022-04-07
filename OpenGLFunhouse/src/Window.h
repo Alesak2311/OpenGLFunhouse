@@ -29,5 +29,6 @@ public:
 
 	inline GLFWwindow* GetGLFWWindow() const { return m_Window; }
 	inline float GetAspectRatio() const { return m_Aspect; }
+	inline Camera* GetBoundCamera() const { return m_BoundCamera; }
 };
 

@@ -133,7 +133,7 @@ int main()
 			{
 				glm::mat4 model = glm::mat4(1.0f);
 
-				glm::mat4 view = camera.GenViewMat();
+				glm::mat4 view = window.GetBoundCamera()->GenViewMat();
 
 				glm::mat4 mvp = proj * view * model;
 				shader.UniformMat4f("u_MVP", mvp);
